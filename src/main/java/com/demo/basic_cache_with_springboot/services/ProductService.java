@@ -3,6 +3,7 @@ package com.demo.basic_cache_with_springboot.services;
 import com.demo.basic_cache_with_springboot.dto.ProductDto;
 import com.demo.basic_cache_with_springboot.exceptions.ResourceNotFoundException;
 import com.demo.basic_cache_with_springboot.repositories.ProductRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,12 +20,15 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProductDto> findAll() {
-        return productRepository
+    @Cacheable("allProducts")
+    public List<ProductDto> findAll() throws Exception {
+        var allProducts = productRepository
                 .findAll()
                 .stream()
                 .map(product -> new ProductDto(product.getId(), product.getName(), product.getDescription()))
                 .toList();
+        Thread.sleep(10000);
+        return allProducts;
     }
 
     @Transactional(readOnly = true)

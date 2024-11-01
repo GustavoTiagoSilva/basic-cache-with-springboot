@@ -24,7 +24,7 @@ public class ProductController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<ProductDto> findAll() {
+    public List<ProductDto> findAll() throws Exception {
         return productService.findAll();
     }
 
