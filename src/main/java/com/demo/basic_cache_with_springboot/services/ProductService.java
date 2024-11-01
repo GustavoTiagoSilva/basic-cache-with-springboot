@@ -1,7 +1,13 @@
 package com.demo.basic_cache_with_springboot.services;
 
+import com.demo.basic_cache_with_springboot.dto.ProductDto;
+import com.demo.basic_cache_with_springboot.exceptions.ResourceNotFoundException;
 import com.demo.basic_cache_with_springboot.repositories.ProductRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ProductService {
@@ -10,5 +16,22 @@ public class ProductService {
 
     public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductDto> findAll() {
+        return productRepository
+                .findAll()
+                .stream()
+                .map(product -> new ProductDto(product.getId(), product.getName(), product.getDescription()))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public ProductDto findById(UUID id) {
+        var product = productRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product with id: " + id + " not found"));
+        return new ProductDto(product.getId(), product.getName(), product.getDescription());
     }
 }
